@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
-const { ApolloServer, PubSub } = require('apollo-server');
+const { ApolloServer} = require('apollo-server');
+const { PubSub} = require('graphql-subscriptions');
 const fs = require('fs');
 const path = require('path');
 const { getUserId } = require('./utils');
@@ -7,6 +8,8 @@ const Query = require('./resolvers/Query')
 const Mutation = require('./resolvers/Mutation')
 const User = require('./resolvers/User')
 const Link = require('./resolvers/Link')
+const Subscription = require('./resolvers/Subscription')
+
 
 const pubsub = new PubSub()
 
@@ -15,8 +18,9 @@ const prisma = new PrismaClient()
 const resolvers = {
   Query,
   Mutation,
+  Subscription,
   User,
-  Link
+  Link,
 }
 
 //  creating the context as a function which returns the context
@@ -31,6 +35,7 @@ const server = new ApolloServer({
     return {
       ...req,
       prisma,
+      pubsub,
       userId:
         req && req.headers.authorization
           ? getUserId(req)

@@ -1,9 +1,6 @@
 const jwt = require('jsonwebtoken');
 const APP_SECRET = 'GraphQL-is-aw3some';
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
-const { APP_SECRET, getUserId } = require('../utils')
-
 function getTokenPayload(token) {
   return jwt.verify(token, APP_SECRET);
 }

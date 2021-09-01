@@ -12,3 +12,45 @@ const { PubSub } = require('apollo-server')
 
 const pubsub = new PubSub()
 ```
+return {
+      ...req,
+      prisma,
+      pubsub,
+      userId:
+        req && req.headers.authorization
+          ? getUserId(req)
+          : null
+    };
+-[] touch src/resolvers/Subscription.js
+```
+function newLinkSubscribe(parent, args, context, info) {
+  return context.pubsub.asyncIterator("NEW_LINK")
+}
+
+const newLink = {
+  subscribe: newLinkSubscribe,
+  resolve: payload => {
+    return payload
+  },
+}
+
+module.exports = {
+  newLink,
+}
+
+```
+-[] mutation js update:
+async function post(parent, args, context, info) {
+  const { userId } = context;
+
+  const newLink = await context.prisma.link.create({
+    data: {
+      url: args.url,
+      description: args.description,
+      postedBy: { connect: { id: userId } },
+    }
+  })
+  context.pubsub.publish("NEW_LINK", newLink)
+
+  return newLink
+}
