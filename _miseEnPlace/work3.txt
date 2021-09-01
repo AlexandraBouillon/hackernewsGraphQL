@@ -1,4 +1,4 @@
-##Adding a User model
+## Authentication - Adding a User model
 
 
 -[] add a User type to your Prisma data model.
@@ -28,3 +28,140 @@ model User {
 -[] every change you make to the data model, you need to migrate your database and then re-generate Prisma Client.
 
     npx prisma migrate dev --name "add-user-model"
+
+
+-[] to re-generate PrismaClient
+    npx prisma generate
+
+-[] Open the application schema in src/schema.graphql and update the Mutation type as follows:
+
+.../hackernews-node/src/schema.graphql
+type Mutation {
+  post(url: String!, description: String!): Link!
+  signup(email: String!, password: String!, name: String!): AuthPayload
+  login(email: String!, password: String!): AuthPayload
+}
+
+
+-[]  in src/schema.graphql, add the following type definitions:
+
+
+type AuthPayload {
+  token: String
+  user: User
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  links: [Link!]!
+}
+
+
+-[]  to reflect that the relation between User and Link should be bi-directional by adding the postedBy field to the existing Link model definition in schema.graphql:
+
+type Link {
+  id: ID!
+  description: String!
+  url: String!
+  postedBy: User
+}
+
+
+
+## Implementing the resolver functions ##
+
+-[] refactor code  to keep it modular, create a new directory called resolvers and add four files to it: Query.js, Mutation.js, User.js and Link.js.
+
+-[] move the implementation of the feed resolver into Query.js.
+
+
+-[] add the required dependencies /hackernews-node/
+    npm install jsonwebtoken bcryptjs
+-[] a new file inside the src directory /hackernews-node/
+touch src/utils.js
+```
+const jwt = require('jsonwebtoken');
+const APP_SECRET = 'GraphQL-is-aw3some';
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+const { APP_SECRET, getUserId } = require('../utils')
+
+function getTokenPayload(token) {
+  return jwt.verify(token, APP_SECRET);
+}
+
+function getUserId(req, authToken) {
+  if (req) {
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      if (!token) {
+        throw new Error('No token found');
+      }
+      const { userId } = getTokenPayload(token);
+      return userId;
+    }
+  } else if (authToken) {
+    const { userId } = getTokenPayload(authToken);
+    return userId;
+  }
+
+  throw new Error('Not authenticated');
+}
+
+module.exports = {
+  APP_SECRET,
+  getUserId
+};
+```
+
+-[]
+In Mutation.js, add the following resolver implementation for post:
+
+.../hackernews-node/src/resolvers/Mutation.js
+async function post(parent, args, context, info) {
+  const { userId } = context;
+
+  return await context.prisma.link.create({
+    data: {
+      url: args.url,
+      description: args.description,
+      postedBy: { connect: { id: userId } },
+    }
+  })
+}
+
+
+-[] To resolve the postedBy relation, open Link.js and add the following code to it:
+
+.../hackernews-node/src/resolvers/Link.js
+function postedBy(parent, args, context) {
+  return context.prisma.link.findUnique({ where: { id: parent.id } }).postedBy()
+}
+
+module.exports = {
+  postedBy,
+}
+
+
+-[] Open User.js and add the following code to it:
+
+.../hackernews-node/src/resolvers/User.js
+function links(parent, args, context) {
+  return context.prisma.user.findUnique({ where: { id: parent.id } }).links()
+}
+
+module.exports = {
+  links,
+}
+-[]  update the definition of the resolvers object to look as follows:
+
+.../hackernews-node/src/index.js
+const resolvers = {
+  Query,
+  Mutation,
+  User,
+  Link
+}
