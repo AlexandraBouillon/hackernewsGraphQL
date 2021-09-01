@@ -1,0 +1,86 @@
+-[] mkdir hackernews-node
+-[] cd hackernews-node
+-[] npm init -y
+-[x] Creating a raw GraphQL server
+    mkdir src
+    touch src/index.js
+-[]  install two important dependencies that will allow you to create your GraphQL server.
+
+    npm install apollo-server graphql
+
+-[] implementing a feed query which allows you to retrieve a list of Link elements
+-[] Implementing the resolver function
+Next, update the resolvers functions to look as follows:
+
+../hackernews-node/src/index.js
+let links = [{
+  id: 'link-0',
+  url: 'www.howtographql.com',
+  description: 'Fullstack tutorial for GraphQL'
+}]
+
+// 1
+const resolvers = {
+  Query: {
+    info: () => `This is the API of a Hackernews Clone`,
+    feed: () => links,
+  },
+  Mutation: {
+    // 2
+    post: (parent, args) => {
+
+    let idCount = links.length
+
+       const link = {
+        id: `link-${idCount++}`,
+        description: args.description,
+        url: args.url,
+      }
+      links.push(link)
+      return link
+    }
+  },
+}
+## Adding a Database
+Prisma is an open source database toolkit that makes it easy for developers to reason about their data and how they access it
+-[] npm install prisma --save-dev
+-[] npm install @prisma/client
+-[] npx prisma init
+    ```shema.prisma
+    // This is your Prisma schema file,
+    // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+    // Tells Prisma you’ll be using SQLite for your database connection
+    datasource db {
+    provider = "sqlite"
+    url      = "file:./dev.db"
+    }
+
+    // Indicates that you want to genenerate Prisma Client.
+    generator client {
+    provider = "prisma-client-js"
+    }
+
+    // written out the Link as a model.
+    model Link {
+    id          Int      @id @default(autoincrement())
+    createdAt   DateTime @default(now())
+    description String
+    url         String
+    }
+    ```
+    -[] From the root directory of your project, create your first migration by running the following command in your terminal:
+
+$
+.../hackernews-node/
+npx prisma migrate dev
+-[]name it “init”. Type in the name and hit Enter.
+https://www.prisma.io/docs/concepts/components/prisma-migrate
+
+-[]generate Prisma Client
+npx prisma generate
+-[]Create a new file in the src/ directory called script.js and add the following code:
+```
+
+```
+node src/script.js

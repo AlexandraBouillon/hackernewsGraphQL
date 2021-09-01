@@ -1,0 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Tells Prisma you’ll be using SQLite for your database connection
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Indicates that you want to genenerate Prisma Client.
+generator client {
+  provider = "prisma-client-js"
+}
+
+// written out the Link as a model.
+model Link {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  description String
+  url         String
+}

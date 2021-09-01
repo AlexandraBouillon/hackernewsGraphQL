@@ -1,0 +1,61 @@
+## GraphQL schema
+
+-[] The typeDefs constant defines your GraphQL schema (more about this in a bit). Here, it defines a simple Query type with one field called info. This field has the type String!. The exclamation mark in the type definition means that this field is required and can never be null.
+-[] The resolvers object is the actual implementation of the GraphQL schema. Notice how its structure is identical to the structure of the type definition inside typeDefs: Query.info.
+-[] The schema and resolvers are bundled and passed to ApolloServer which is imported from apollo-server. This tells the server what API operations are accepted and how they should be resolved.
+-[] implementing a feed query which allows you to retrieve a list of Link elements. In general, when adding a new feature to the API, the process will look pretty similar every time:
+
+Extend the GraphQL schema definition with a new root field (and new object types, if needed)
+Implement corresponding resolver functions for the added fields
+This process is also referred to as schema-driven or schema-first development.
+
+-[]  simple GraphQL schema:
+
+type Query {
+  info: String!
+}
+-[] advanced example:
+
+type Query {
+  users: [User!]!
+  user(id: ID!): User
+}
+
+type Mutation {
+  createUser(name: String!): User!
+}
+
+type User {
+  id: ID!
+  name: String!
+}
+
+-[] operations that are accepted by a GraphQL API that implements the above schema:
+
+# Query for all users
+query {
+  users {
+    id
+    name
+  }
+}
+
+# Query a single user by their id
+query {
+  user(id: "user-1") {
+    id
+    name
+  }
+}
+
+# Create a new user
+mutation {
+  createUser(name: "Bob") {
+    id
+    name
+  }
+}
+
+    -For the users field, the return type [User!]! means it returns a list (which itself cannot be null) of User elements. The list can also not contain elements that are null. So, you’re always guaranteed to either receive an empty list or a list that only contains non-null User objects.
+    -For the user(id: ID!) field, the return type User means the returned value could be null or a User object.
+    -For the createUser(name: String!) field, the return type User! means this operation always returns a User object.
