@@ -45,7 +45,8 @@ const resolvers = {
 Prisma is an open source database toolkit that makes it easy for developers to reason about their data and how they access it
 -[] npm install prisma --save-dev
 -[] npm install @prisma/client
--[] npx prisma init
+-[] use the Prisma CLI to initialize Prisma in the project root in terminal:
+    npx prisma init
     ```shema.prisma
     // This is your Prisma schema file,
     // learn more about it in the docs: https://pris.ly/d/prisma-schema
@@ -69,11 +70,10 @@ Prisma is an open source database toolkit that makes it easy for developers to r
     url         String
     }
     ```
-    -[] From the root directory of your project, create your first migration by running the following command in your terminal:
 
-$
-.../hackernews-node/
-npx prisma migrate dev
+-[] From the root directory of your project, create your first migration by running the following command in your terminal:
+  npx prisma migrate dev
+
 -[]name it “init”. Type in the name and hit Enter.
 https://www.prisma.io/docs/concepts/components/prisma-migrate
 
@@ -81,6 +81,56 @@ https://www.prisma.io/docs/concepts/components/prisma-migrate
 npx prisma generate
 -[]Create a new file in the src/ directory called script.js and add the following code:
 ```
+// 1
+const { PrismaClient } = require("@prisma/client")
 
+// 2
+const prisma = new PrismaClient()
+
+// 3
+async function main() {
+  const allLinks = await prisma.link.findMany()
+  console.log(allLinks)
+}
+
+// 4
+main()
+  .catch(e => {
+    throw e
+  })
+  // 5
+  .finally(async () => {
+    await prisma.$disconnect()
+  })
 ```
-node src/script.js
+
+
+-[] node src/script.js
+-[] Re-run the previous command and this time you should now see your newly created link print in the terminal output! Much more satisfying
+```
+
+  {
+    id: 1,
+    createdAt: 2021-09-01T09:59:31.555Z,
+    description: 'Fullstack tutorial for GraphQL',
+    url: 'www.howtographql.com'
+  },
+  {
+    id: 2,
+    createdAt: 2021-09-01T10:03:07.823Z,
+    description: 'Fullstack tutorial for GraphQL',
+    url: 'www.howtographql.com'
+  }
+]
+```
+
+
+
+
+### Summary of your workflow ###
+To recap, this is the typical workflow you will follow when updating your data:
+
+Manually adjust your Prisma data model.
+Migrate your database using the prisma migrate CLI commands we covered.
+(Re-)generate Prisma Client
+Use Prisma Client in your application code to access your database.
