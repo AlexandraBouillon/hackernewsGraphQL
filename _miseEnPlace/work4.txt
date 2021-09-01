@@ -1,1 +1,58 @@
 ## Testing the authentication flow ##
+ send the following mutation to create a new User:
+
+mutation {
+  signup(name: "Alice", email: "alice@prisma.io", password: "graphql") {
+    token
+    user {
+      id
+    }
+  }
+}
+From the server’s response, copy the authentication token and open another tab in the Playground. Inside that new tab, open the HTTP HEADERS pane in the bottom-left corner and specify the Authorization header - similar to what you did with the Prisma Playground before. Replace the __TOKEN__ placeholder in the following snippet with the copied token:
+
+{
+  "Authorization": "Bearer __TOKEN__"
+}
+Whenever you’re now sending a query/mutation from that tab, it will carry the authentication token.
+
+With the Authorization header in place, send the following to your GraphQL server:
+
+mutation {
+  post(url: "www.graphqlconf.org", description: "An awesome GraphQL conference") {
+    id
+  }
+}
+
+ verify everything worked, you can send the following login mutation:
+
+mutation {
+  login(email: "alice@prisma.io", password: "graphql") {
+    token
+    user {
+      email
+      links {
+        url
+        description
+      }
+    }
+  }
+}
+This will return a response similar to this:
+
+{
+  "data": {
+    "login": {
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjanBzaHVsazJoM3lqMDk0NzZzd2JrOHVnIiwiaWF0IjoxNTQ1MDYyNTQyfQ.KjGZTxr1jyJH7HcT_0glRInBef37OKCTDl0tZzogekw",
+      "user": {
+        "email": "alice@prisma.io",
+        "links": [
+          {
+            "url": "www.graphqlconf.org",
+            "description": "An awesome GraphQL conference"
+          }
+        ]
+      }
+    }
+  }
+}

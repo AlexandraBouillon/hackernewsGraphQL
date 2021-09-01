@@ -1,0 +1,14 @@
+## GraphQL subscriptions?
+- afeature that allows a server to send data to its clients when a specific event happens.
+- Subscriptions are usually implemented with WebSockets.
+- In that setup, the server maintains a steady connection to its subscribed client.
+- This also breaks the “Request-Response-Cycle” that were used for all previous interactions with the API.
+
+
+## Setting up PubSub ##
+-[] index.js
+```
+const { PubSub } = require('apollo-server')
+
+const pubsub = new PubSub()
+```
