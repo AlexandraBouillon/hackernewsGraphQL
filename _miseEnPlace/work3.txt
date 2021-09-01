@@ -1,18 +1,12 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+##Adding a User model
 
-// Tells Prisma you’ll be using SQLite for your database connection
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
 
-// Indicates that you want to genenerate Prisma Client.
-generator client {
-  provider = "prisma-client-js"
-}
+-[] add a User type to your Prisma data model.
 
-// written out the Link as a model.
+
+-[] prisma/schema.prisma and add the following code,
+
+making sure to also update your existing Link model accordingly:
 model Link {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
@@ -29,3 +23,8 @@ model User {
   password  String
   links     Link[]
 }
+
+
+-[] every change you make to the data model, you need to migrate your database and then re-generate Prisma Client.
+
+    npx prisma migrate dev --name "add-user-model"

@@ -1,3 +1,6 @@
+// Defining a new Link type that represents the links that can be posted to Hacker News.
+// Each Link has an id, a description, and a url.
+
 type Query {
   info: String!
   feed: [Link!]!
