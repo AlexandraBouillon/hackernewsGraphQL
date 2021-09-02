@@ -1,0 +1,17 @@
+## Filtering, Pagination & Sorting     ##
+Pagination
+Pagination is a tricky topic in API design. On a high-level, there are two major approaches for tackling it:
+
+Limit-Offset: Request a specific chunk of the list by providing the indices of the items to be retrieved (in fact, you’re mostly providing the start index (offset) as well as a count of items to be retrieved (limit)).
+Cursor-based: This pagination model is a bit more advanced. Every element in the list is associated with a unique ID (the cursor). Clients paginating through the list then provide the cursor of the starting element as well as a count of items to be retrieved.
+
+-[] add the filter string to the feed query in your application schema:
+
+.../hackernews-node/src/schema.graphql
+type Query {
+  info: String!
+  feed(filter: String): [Link!]!
+}
+
+
+## Sorting ##

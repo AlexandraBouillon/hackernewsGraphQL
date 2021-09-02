@@ -1,14 +1,6 @@
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
-}
-
-
-generator client {
-  provider = "prisma-client-js"
-}
-
-
+## Adding a voting feature##
+-[] prisma/schema.prisma  added a new Vote type to the data model.
+ It has one-to-many relationships to the User and the Link type.
 model Link {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
@@ -37,3 +29,7 @@ model Vote {
 
   @@unique([linkId, userId])
 }
+-[]  migrate your database schema with the following commands:
+
+npx prisma migrate dev --name "add-vote-model"
+-[] npx prisma generate

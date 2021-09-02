@@ -54,3 +54,10 @@ async function post(parent, args, context, info) {
 
   return newLink
 }
+
+
+-[]
+    npx prisma migrate dev --name "add-vote-model"
+
+    -[]
+        npx prisma generate
